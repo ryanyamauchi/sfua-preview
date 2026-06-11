@@ -18,15 +18,18 @@
   var STORE_KEY = "sfua-network-sites-v1";
 
   var TYPES = {
-    producer:     { label: "Producer (farm / garden / grower)", color: "#6B8C6B" },
-    aggregator:   { label: "Supplier / aggregator / food recovery", color: "#C47B35" },
-    storage:      { label: "Storage (cold / dry)",               color: "#4A7B9D" },
-    distribution: { label: "Distribution hub",                   color: "#8B5E3C" },
-    kitchen:      { label: "Kitchen / meal provider",            color: "#A85751" },
-    market:       { label: "Market / pantry / food access program", color: "#7E6BA8" },
-    partner:      { label: "Agency / convening partner",         color: "#7A6E5F" },
-    other:        { label: "Other",                              color: "#2C2416" }
+    producer:     { label: "Producer (farm / garden / grower)", color: "#3DF0A4" },
+    aggregator:   { label: "Supplier / aggregator / food recovery", color: "#FFB454" },
+    storage:      { label: "Storage (cold / dry)",               color: "#5EB3FF" },
+    distribution: { label: "Distribution hub",                   color: "#FF8A5E" },
+    kitchen:      { label: "Kitchen / meal provider",            color: "#FF6B8A" },
+    market:       { label: "Market / pantry / food access program", color: "#C99CFF" },
+    partner:      { label: "Agency / convening partner",         color: "#8A95A1" },
+    other:        { label: "Other",                              color: "#E9EDF1" }
   };
+
+  var TILE_URL = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+  var TILE_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
 
   var LA_CENTER = [34.02, -118.28];
 
@@ -208,6 +211,9 @@
   document.querySelectorAll(".nw-jump-map").forEach(function (a) {
     a.addEventListener("click", function (e) { e.preventDefault(); showView("map"); scrollToApp(); });
   });
+  document.querySelectorAll("[data-jump]").forEach(function (a) {
+    a.addEventListener("click", function (e) { e.preventDefault(); showView(a.dataset.jump); scrollToApp(); });
+  });
 
   function scrollToApp() {
     document.querySelector(".nw-app-section").scrollIntoView({ behavior: "smooth" });
@@ -310,10 +316,7 @@
     if (!window.L) return;
     if (!mainMap) {
       mainMap = L.map("nw-map").setView(LA_CENTER, 10);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(mainMap);
+      L.tileLayer(TILE_URL, { maxZoom: 19, attribution: TILE_ATTR }).addTo(mainMap);
       markerLayer = L.layerGroup().addTo(mainMap);
       renderMapFilters();
     }
@@ -482,10 +485,7 @@
     if (!window.L || form.hidden) return;
     if (!formMap) {
       formMap = L.map("nw-form-map").setView(LA_CENTER, 9);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(formMap);
+      L.tileLayer(TILE_URL, { maxZoom: 19, attribution: TILE_ATTR }).addTo(formMap);
       formMap.on("click", function (e) {
         setFormPin(e.latlng.lat, e.latlng.lng);
         document.getElementById("f-lat").value = e.latlng.lat.toFixed(5);

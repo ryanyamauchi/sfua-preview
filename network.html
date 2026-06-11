@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LA Regional Food Network — Solutions for Urban Agriculture</title>
-  <meta name="description" content="A shared map of producer, storage, and distribution infrastructure across LA County, built with partners to coordinate local produce for local buyers." />
-  <link rel="stylesheet" href="assets/css/styles.css" />
+  <title>Food Network OS — SFUA / LA County</title>
+  <meta name="description" content="A private operations console for LA County's coordinated food infrastructure: producers, storage, distribution, and buyers in one live network." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <link rel="stylesheet" href="assets/css/network.css" />
@@ -13,52 +15,52 @@
 <body>
 
   <!-- ============================================================
-       NAV
+       TOPBAR
        ============================================================ -->
-  <header class="site-nav" role="banner">
-    <div class="container">
-      <a href="index.html" class="nav-logo" aria-label="SFUA Home">
-        <span class="logo-abbr">SFUA</span>
-        <span class="logo-full">Solutions for Urban Agriculture</span>
-      </a>
-      <nav class="nav-links" aria-label="Primary navigation">
-        <a href="production.html">Production</a>
-        <a href="education.html">Education</a>
-        <a href="distribution.html">Distribution</a>
-        <a href="harvest-moon.html">Harvest Moon</a>
-        <a href="network.html" aria-current="page">Food Network</a>
-      </nav>
-      <div class="nav-cta">
-        <a href="#add" class="btn btn--primary nw-jump-add">Add Your Sites</a>
-      </div>
-      <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
+  <header class="topbar" role="banner">
+    <a class="brand" href="network.html" aria-label="Food Network OS home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      SFUA<span class="brand-sep">/</span>FOOD&nbsp;NETWORK
+    </a>
+    <span class="topbar-meta">LA COUNTY &middot; REGIONAL INFRASTRUCTURE</span>
+    <nav class="topbar-actions" aria-label="Site">
+      <a href="index.html" class="topbar-link">MAIN SITE &#8599;</a>
+      <a href="#add" class="btn btn--primary nw-jump-add">Add Your Sites</a>
+    </nav>
   </header>
 
 
   <!-- ============================================================
        HERO
        ============================================================ -->
-  <section class="page-hero" aria-labelledby="network-hero-heading">
-    <div class="container">
-      <div class="page-hero-content nw-hero-content">
-        <span class="eyebrow">A Shared Tool for Partners</span>
-        <h1 id="network-hero-heading">The LA Regional <em>Food Network</em></h1>
-        <p class="lead">
-          One shared picture of the infrastructure we already have: who grows,
-          who stores, who moves, and who serves food across LA County. Each
-          partner enters its own sites; together the map shows where local
-          produce can reach local buyers — strengthening the local economy and
-          sustaining local growers, without disturbing the operations,
-          contracts, and needs each organization already serves.
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="container hero-grid">
+
+      <div class="hero-copy">
+        <p class="kicker">Regional Food Infrastructure &mdash; Private Partner Network</p>
+        <h1 id="hero-heading">Local supply.<br />Local demand.<br /><span class="accent">One system.</span></h1>
+        <p class="lede">
+          Producers, storage, fleets, kitchens, and buyers across LA County —
+          entered by the partners who run them, synced live, and modeled to move
+          local produce to local tables without disturbing the operations,
+          contracts, and needs already being served.
         </p>
-        <div class="hero-actions">
+        <div class="hero-cta">
           <a href="#add" class="btn btn--primary nw-jump-add">Add Your Sites</a>
-          <a href="#map" class="btn btn--outline nw-jump-map">View the Map</a>
+          <a href="#map" class="btn btn--ghost nw-jump-map">View the Map</a>
         </div>
       </div>
+
+      <nav class="hero-index" aria-label="System index">
+        <p class="index-label">Index</p>
+        <a href="#dashboard" data-jump="dashboard"><span>01</span>Overview<em>stats &amp; network signals</em></a>
+        <a href="#map" data-jump="map"><span>02</span>Map<em>infrastructure across the county</em></a>
+        <a href="#directory" data-jump="directory"><span>03</span>Directory<em>every site, searchable</em></a>
+        <a href="#regional" data-jump="regional"><span>04</span>Regional<em>county food-system data</em></a>
+        <a href="#add" data-jump="add"><span>05</span>Intake<em>enter your organization&rsquo;s sites</em></a>
+        <a href="#data" data-jump="data"><span>06</span>Data<em>sync, export, provenance</em></a>
+      </nav>
+
     </div>
   </section>
 
@@ -66,7 +68,7 @@
   <!-- ============================================================
        APP
        ============================================================ -->
-  <section class="section section--white nw-app-section" aria-label="Food network application">
+  <section class="nw-app-section" aria-label="Food network application">
     <div class="container">
 
       <div id="nw-authbar" class="nw-authbar"></div>
@@ -74,12 +76,11 @@
       <!-- Sign-in screen, shown instead of the app until a partner logs in (live mode) -->
       <div id="nw-locked" class="nw-locked" hidden>
         <div class="nw-locked-box">
-          <span class="eyebrow">Private Partner Network</span>
-          <h2>Partner sign-in</h2>
+          <p class="kicker">Restricted &mdash; Partner Access</p>
+          <h2>Sign in to the network</h2>
           <p class="nw-muted">
-            While we build this together, the network map and directory are
-            visible to signed-in partners only. Use the login SFUA provided
-            to your organization.
+            The map, directory, and all site data are visible to signed-in
+            partners only. Use the login SFUA provided to your organization.
           </p>
           <form id="nw-signin-form" class="nw-signin">
             <label class="sr-only" for="nw-si-email">Email</label>
@@ -91,7 +92,7 @@
           <p class="nw-form-msg" id="nw-si-msg" role="status"></p>
           <p class="nw-muted">
             Need a login or a password reset?
-            Email <a href="mailto:ryanyamauchi@sfua.org">ryanyamauchi@sfua.org</a>.
+            <a href="mailto:ryanyamauchi@sfua.org">ryanyamauchi@sfua.org</a>
           </p>
         </div>
       </div>
@@ -99,19 +100,19 @@
       <div id="nw-app-body">
 
       <div class="nw-tabs" role="tablist" aria-label="Network views">
-        <button class="nw-tab is-active" data-view="dashboard" role="tab" aria-selected="true">Dashboard</button>
-        <button class="nw-tab" data-view="map" role="tab" aria-selected="false">Map</button>
-        <button class="nw-tab" data-view="directory" role="tab" aria-selected="false">Directory</button>
-        <button class="nw-tab" data-view="regional" role="tab" aria-selected="false">Regional Data</button>
-        <button class="nw-tab" data-view="add" role="tab" aria-selected="false">Add a Site</button>
-        <button class="nw-tab" data-view="data" role="tab" aria-selected="false">Data &amp; Sharing</button>
+        <button class="nw-tab is-active" data-view="dashboard" role="tab" aria-selected="true"><span>01</span>Overview</button>
+        <button class="nw-tab" data-view="map" role="tab" aria-selected="false"><span>02</span>Map</button>
+        <button class="nw-tab" data-view="directory" role="tab" aria-selected="false"><span>03</span>Directory</button>
+        <button class="nw-tab" data-view="regional" role="tab" aria-selected="false"><span>04</span>Regional</button>
+        <button class="nw-tab" data-view="add" role="tab" aria-selected="false"><span>05</span>Intake</button>
+        <button class="nw-tab" data-view="data" role="tab" aria-selected="false"><span>06</span>Data</button>
       </div>
 
-      <!-- ---------------- DASHBOARD ---------------- -->
+      <!-- ---------------- 01 OVERVIEW ---------------- -->
       <div class="nw-view is-active" id="view-dashboard" role="tabpanel">
         <div class="section-header">
-          <span class="eyebrow">Network at a Glance</span>
-          <h2>What the network holds today</h2>
+          <p class="kicker">01 &mdash; Overview</p>
+          <h2>What the network holds</h2>
         </div>
 
         <div class="nw-stat-grid" id="nw-stats"></div>
@@ -124,33 +125,33 @@
         <div class="nw-panel">
           <h3>Network signals <span class="nw-badge nw-badge--proto">prototype</span></h3>
           <p class="nw-muted">
-            Simple distance-based observations to start the optimization
-            conversation — they get more useful as real capacities, schedules,
-            and commitments are entered. They never override an organization's
-            existing contracts or the needs it already serves.
+            Distance-based observations to start the optimization conversation —
+            they sharpen as real capacities, schedules, and commitments are
+            entered. They never override an organization&rsquo;s existing contracts
+            or the needs it already serves.
           </p>
           <div id="nw-insights"></div>
         </div>
       </div>
 
-      <!-- ---------------- MAP ---------------- -->
+      <!-- ---------------- 02 MAP ---------------- -->
       <div class="nw-view" id="view-map" role="tabpanel" hidden>
         <div class="section-header">
-          <span class="eyebrow">Infrastructure Map</span>
-          <h2>The network across LA County</h2>
+          <p class="kicker">02 &mdash; Map</p>
+          <h2>Infrastructure across the county</h2>
         </div>
         <div class="nw-map-filters" id="nw-map-filters" aria-label="Filter map by site role"></div>
         <div id="nw-map" class="nw-map" aria-label="Map of network sites"></div>
         <p class="nw-muted nw-map-note">
-          Faded pins are unverified placeholders from the June 2026 convening —
-          each organization replaces them with real entries. Click a pin for details.
+          Dimmed markers are unverified placeholders from the June 2026 convening —
+          each organization replaces them with confirmed entries. Select a marker for details.
         </p>
       </div>
 
-      <!-- ---------------- DIRECTORY ---------------- -->
+      <!-- ---------------- 03 DIRECTORY ---------------- -->
       <div class="nw-view" id="view-directory" role="tabpanel" hidden>
         <div class="section-header">
-          <span class="eyebrow">Site Directory</span>
+          <p class="kicker">03 &mdash; Directory</p>
           <h2>Every site in the network</h2>
         </div>
         <div class="nw-dir-controls">
@@ -160,21 +161,21 @@
         <div class="nw-dir-list" id="nw-dir-list"></div>
       </div>
 
-      <!-- ---------------- REGIONAL DATA ---------------- -->
+      <!-- ---------------- 04 REGIONAL DATA ---------------- -->
       <div class="nw-view" id="view-regional" role="tabpanel" hidden>
         <div class="section-header">
-          <span class="eyebrow">Beyond Our Network</span>
-          <h2>LA County food system data</h2>
+          <p class="kicker">04 &mdash; Regional</p>
+          <h2>LA County food-system data</h2>
         </div>
         <p class="nw-muted nw-regional-intro">
           Countywide context for our planning: an interactive LA County
           food-system dashboard with data on food and nutrition insecurity and
-          the communities our sites serve. This is a separate view from our
-          partner network — the data here belongs to its publisher and is
-          displayed alongside ours for the bigger picture.
+          the communities our sites serve. A separate view from our partner
+          network — the data here belongs to its publisher and is displayed
+          alongside ours for the bigger picture.
         </p>
         <div class="nw-regional-actions">
-          <a class="btn btn--outline"
+          <a class="btn btn--ghost"
              href="https://experience.arcgis.com/experience/a4daa72b157b4b969a058909cef387cd/page/Dashboard"
              target="_blank" rel="noopener">Open the Full Dashboard &#8599;</a>
         </div>
@@ -186,19 +187,19 @@
         </div>
         <p class="nw-muted nw-map-note">
           If the dashboard stays blank here, its publisher may not allow
-          embedding in other sites — use "Open the Full Dashboard" above instead.
+          embedding in other sites — use &ldquo;Open the Full Dashboard&rdquo; above instead.
         </p>
       </div>
 
-      <!-- ---------------- ADD / EDIT ---------------- -->
+      <!-- ---------------- 05 INTAKE ---------------- -->
       <div class="nw-view" id="view-add" role="tabpanel" hidden>
         <div class="section-header">
-          <span class="eyebrow">Partner Input</span>
+          <p class="kicker">05 &mdash; Intake</p>
           <h2 id="nw-form-heading">Add a site to the network</h2>
         </div>
         <p class="nw-muted">
           Enter each physical site separately — a farm, a cold-storage room, a
-          loading dock, a kitchen, a market. Share what you're comfortable
+          loading dock, a kitchen, a market. Share what you&rsquo;re comfortable
           sharing; every field except the first three is optional and can be
           filled in later.
         </p>
@@ -265,7 +266,7 @@
                 <input type="text" id="f-transport" placeholder="e.g., 1 refrigerated box truck, 2 vans" />
               </label>
               <label>Schedule / days of operation
-                <input type="text" id="f-schedule" placeholder="e.g., Tue &amp; Fri receiving, M–F 7am–3pm" />
+                <input type="text" id="f-schedule" placeholder="e.g., Tue &amp; Fri receiving, M&ndash;F 7am&ndash;3pm" />
               </label>
             </div>
           </fieldset>
@@ -279,7 +280,7 @@
               <textarea id="f-needsServed" rows="2" placeholder="Populations, programs, or buyers depending on this site today"></textarea>
             </label>
             <label>Surplus you could offer / gaps you need filled
-              <textarea id="f-offersNeeds" rows="2" placeholder="e.g., excess summer squash Jul–Sep; need cold storage near 90044; spare truck capacity on Thursdays"></textarea>
+              <textarea id="f-offersNeeds" rows="2" placeholder="e.g., excess summer squash Jul&ndash;Sep; need cold storage near 90044; spare truck capacity on Thursdays"></textarea>
             </label>
           </fieldset>
 
@@ -300,17 +301,17 @@
 
           <div class="nw-form-actions">
             <button type="submit" class="btn btn--primary" id="nw-form-submit">Save Site</button>
-            <button type="button" class="btn btn--outline" id="nw-form-reset">Clear Form</button>
+            <button type="button" class="btn btn--ghost" id="nw-form-reset">Clear Form</button>
             <span class="nw-form-msg" id="nw-form-msg" role="status"></span>
           </div>
         </form>
       </div>
 
-      <!-- ---------------- DATA & SHARING ---------------- -->
+      <!-- ---------------- 06 DATA ---------------- -->
       <div class="nw-view" id="view-data" role="tabpanel" hidden>
         <div class="section-header">
-          <span class="eyebrow">Data &amp; Sharing</span>
-          <h2>How the shared picture stays shared</h2>
+          <p class="kicker">06 &mdash; Data</p>
+          <h2>Sync, export, provenance</h2>
         </div>
 
         <div class="nw-panel">
@@ -318,7 +319,7 @@
           <div id="nw-flow-live" hidden>
             <ol class="nw-steps">
               <li><strong>Each partner signs in</strong> with the login SFUA provides — one per organization.</li>
-              <li><strong>Enter or edit your sites</strong> in the Add a Site tab. Changes save to the shared database and appear for every signed-in partner within seconds.</li>
+              <li><strong>Enter or edit your sites</strong> in the Intake tab. Changes save to the shared database and appear for every signed-in partner within seconds.</li>
               <li><strong>SFUA uses the combined dataset</strong> for network modeling and optimization — matching local growers to local buyers without disturbing existing operations.</li>
             </ol>
             <p class="nw-muted">
@@ -329,13 +330,13 @@
           </div>
           <div id="nw-flow-local">
             <ol class="nw-steps">
-              <li><strong>Enter your sites</strong> in the Add a Site tab. They save in this browser immediately.</li>
+              <li><strong>Enter your sites</strong> in the Intake tab. They save in this browser immediately.</li>
               <li><strong>Export your data</strong> below and email the file to
                 <a href="mailto:ryanyamauchi@sfua.org">ryanyamauchi@sfua.org</a>.</li>
-              <li><strong>SFUA merges</strong> every partner's file into the shared baseline that this page loads for everyone — and uses the combined dataset for network modeling and optimization.</li>
+              <li><strong>SFUA merges</strong> every partner&rsquo;s file into the shared baseline that this page loads for everyone — and uses the combined dataset for network modeling and optimization.</li>
             </ol>
             <p class="nw-muted">
-              Prototype mode: the live shared database with partner logins isn't
+              Prototype mode: the live shared database with partner logins isn&rsquo;t
               connected yet (see <code>SETUP-LIVE-DATABASE.md</code> in the repository).
             </p>
           </div>
@@ -344,12 +345,12 @@
         <div class="nw-panel">
           <h3>Your data</h3>
           <div class="nw-data-actions">
-            <button class="btn btn--primary" id="nw-export">Export My Data (JSON)</button>
-            <label class="btn btn--outline nw-import-label" id="nw-import-label">
+            <button class="btn btn--primary" id="nw-export">Export (JSON)</button>
+            <label class="btn btn--ghost nw-import-label" id="nw-import-label">
               Import a Data File
               <input type="file" id="nw-import" accept=".json,application/json" hidden />
             </label>
-            <button class="btn btn--outline" id="nw-reset-baseline">Reset to Shared Baseline</button>
+            <button class="btn btn--ghost" id="nw-reset-baseline">Reset to Shared Baseline</button>
           </div>
           <p class="nw-muted" id="nw-data-status"></p>
         </div>
@@ -373,38 +374,11 @@
   <!-- ============================================================
        FOOTER
        ============================================================ -->
-  <footer class="site-footer section--dark" role="contentinfo">
-    <div class="container">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <span class="logo-abbr">SFUA</span>
-          <span class="logo-full">Solutions for Urban Agriculture</span>
-          <p>
-            Building a regional food system across Southern California through
-            partner farms, education, and community-centered food distribution.
-          </p>
-        </div>
-        <div class="footer-col">
-          <h5>Food Network</h5>
-          <ul>
-            <li><a href="#map" class="nw-jump-map">Infrastructure Map</a></li>
-            <li><a href="#add" class="nw-jump-add">Add Your Sites</a></li>
-            <li><a href="mailto:ryanyamauchi@sfua.org">Contact SFUA</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h5>Programs</h5>
-          <ul>
-            <li><a href="production.html">Agricultural Production</a></li>
-            <li><a href="education.html">Education Programs</a></li>
-            <li><a href="distribution.html">Food Distribution</a></li>
-            <li><a href="harvest-moon.html">Harvest Moon</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p>&copy; 2026 Solutions for Urban Agriculture</p>
-      </div>
+  <footer class="footer" role="contentinfo">
+    <div class="container footer-grid">
+      <span class="footer-brand"><span class="brand-mark" aria-hidden="true"></span>SFUA <span class="brand-sep">/</span> FOOD NETWORK</span>
+      <span class="footer-meta">A shared tool of the LA County food infrastructure coalition</span>
+      <a href="mailto:ryanyamauchi@sfua.org" class="footer-link">ryanyamauchi@sfua.org</a>
     </div>
   </footer>
 
