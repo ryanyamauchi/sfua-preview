@@ -152,9 +152,58 @@
         '<div class="nw-auth nw-auth--in">' +
         '<span><span class="nw-live-dot" aria-hidden="true"></span><strong>Live network</strong> — signed in as ' +
         "<strong>" + esc(user.email) + "</strong>. Your changes appear for all partners instantly.</span>" +
-        '<button class="btn btn--outline nw-btn-sm" id="nw-signout">Sign out</button></div>';
+        '<span class="nw-auth-actions">' +
+        '<button class="btn btn--ghost nw-btn-sm" id="nw-account-toggle">Account</button>' +
+        '<button class="btn btn--ghost nw-btn-sm" id="nw-signout">Sign out</button>' +
+        "</span></div>" +
+        '<form class="nw-account" id="nw-account-form" hidden>' +
+        '<p class="nw-account-title">Change your password</p>' +
+        '<div class="nw-account-fields">' +
+        '<label class="sr-only" for="nw-np1">New password</label>' +
+        '<input type="password" id="nw-np1" placeholder="New password (min 8 characters)" autocomplete="new-password" />' +
+        '<label class="sr-only" for="nw-np2">Repeat new password</label>' +
+        '<input type="password" id="nw-np2" placeholder="Repeat new password" autocomplete="new-password" />' +
+        '<button type="submit" class="btn btn--primary nw-btn-sm">Update Password</button>' +
+        "</div>" +
+        '<span class="nw-form-msg" id="nw-account-msg" role="status"></span>' +
+        "</form>";
+
       document.getElementById("nw-signout").addEventListener("click", function () {
         sb.auth.signOut();
+      });
+      document.getElementById("nw-account-toggle").addEventListener("click", function () {
+        var f = document.getElementById("nw-account-form");
+        f.hidden = !f.hidden;
+        if (!f.hidden) document.getElementById("nw-np1").focus();
+      });
+      document.getElementById("nw-account-form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var p1 = document.getElementById("nw-np1").value;
+        var p2 = document.getElementById("nw-np2").value;
+        var msg = document.getElementById("nw-account-msg");
+        if (p1.length < 8) {
+          msg.textContent = "Use at least 8 characters.";
+          msg.className = "nw-form-msg is-error";
+          return;
+        }
+        if (p1 !== p2) {
+          msg.textContent = "The two passwords don't match.";
+          msg.className = "nw-form-msg is-error";
+          return;
+        }
+        msg.textContent = "Updating…";
+        msg.className = "nw-form-msg";
+        sb.auth.updateUser({ password: p1 }).then(function (res) {
+          if (res.error) {
+            msg.textContent = "Couldn't update: " + res.error.message;
+            msg.className = "nw-form-msg is-error";
+            return;
+          }
+          document.getElementById("nw-np1").value = "";
+          document.getElementById("nw-np2").value = "";
+          msg.textContent = "Password updated — use it next time you sign in.";
+          msg.className = "nw-form-msg is-ok";
+        });
       });
       return;
     }

@@ -795,6 +795,52 @@ code {
   50% { opacity: 0.45; }
 }
 
+.nw-auth-actions { display: inline-flex; gap: 8px; }
+
+.nw-account {
+  border: 1px solid var(--line);
+  border-top: none;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  background: var(--bg-panel);
+  padding: 18px 20px;
+  margin: 0 12px;
+}
+
+.nw-account-title {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+}
+
+.nw-account-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.nw-account-fields input {
+  flex: 1 1 220px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--bg-input);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+.nw-account-fields input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
 .nw-locked { display: flex; justify-content: center; padding: 48px 0 64px; }
 
 .nw-locked-box {

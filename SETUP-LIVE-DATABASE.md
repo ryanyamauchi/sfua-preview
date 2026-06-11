@@ -92,8 +92,11 @@ private too.
 ## Day-to-day
 
 - **Add/remove a partner:** Authentication → Users.
-- **Reset a partner's password:** Authentication → Users → that user →
-  Reset password (or create a fresh account).
+- **Partners change their own passwords** on the page itself:
+  **Account → Change your password** (top of the app once signed in).
+  Encourage everyone to do this on first login.
+- **If a partner is locked out** (forgot password): Authentication →
+  Users → that user → Reset password (or create a fresh account).
 - **Back up the data:** any visitor can use **Data & Sharing →
   Export (JSON)** on the page; that snapshot is also what powers
   network modeling and optimization analysis.
