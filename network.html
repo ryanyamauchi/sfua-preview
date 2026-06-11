@@ -102,6 +102,7 @@
         <button class="nw-tab is-active" data-view="dashboard" role="tab" aria-selected="true">Dashboard</button>
         <button class="nw-tab" data-view="map" role="tab" aria-selected="false">Map</button>
         <button class="nw-tab" data-view="directory" role="tab" aria-selected="false">Directory</button>
+        <button class="nw-tab" data-view="regional" role="tab" aria-selected="false">Regional Data</button>
         <button class="nw-tab" data-view="add" role="tab" aria-selected="false">Add a Site</button>
         <button class="nw-tab" data-view="data" role="tab" aria-selected="false">Data &amp; Sharing</button>
       </div>
@@ -157,6 +158,36 @@
           <select id="nw-dir-type" aria-label="Filter by site role"></select>
         </div>
         <div class="nw-dir-list" id="nw-dir-list"></div>
+      </div>
+
+      <!-- ---------------- REGIONAL DATA ---------------- -->
+      <div class="nw-view" id="view-regional" role="tabpanel" hidden>
+        <div class="section-header">
+          <span class="eyebrow">Beyond Our Network</span>
+          <h2>LA County food system data</h2>
+        </div>
+        <p class="nw-muted nw-regional-intro">
+          Countywide context for our planning: an interactive LA County
+          food-system dashboard with data on food and nutrition insecurity and
+          the communities our sites serve. This is a separate view from our
+          partner network — the data here belongs to its publisher and is
+          displayed alongside ours for the bigger picture.
+        </p>
+        <div class="nw-regional-actions">
+          <a class="btn btn--outline"
+             href="https://experience.arcgis.com/experience/a4daa72b157b4b969a058909cef387cd/page/Dashboard"
+             target="_blank" rel="noopener">Open the Full Dashboard &#8599;</a>
+        </div>
+        <div class="nw-embed">
+          <iframe id="nw-regional-frame"
+                  title="LA County food system dashboard (ArcGIS)"
+                  data-src="https://experience.arcgis.com/experience/a4daa72b157b4b969a058909cef387cd/page/Dashboard"
+                  loading="lazy" allowfullscreen></iframe>
+        </div>
+        <p class="nw-muted nw-map-note">
+          If the dashboard stays blank here, its publisher may not allow
+          embedding in other sites — use "Open the Full Dashboard" above instead.
+        </p>
       </div>
 
       <!-- ---------------- ADD / EDIT ---------------- -->

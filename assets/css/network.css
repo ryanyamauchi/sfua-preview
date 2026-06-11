@@ -185,6 +185,27 @@
 .nw-popup td { font-size: 0.82rem; padding: 2px 0; }
 .nw-popup-org { color: var(--text-muted); font-size: 0.85rem; }
 
+/* ---------------- regional data embed ---------------- */
+.nw-regional-intro { max-width: 70ch; }
+
+.nw-regional-actions { margin-top: 18px; }
+
+.nw-embed {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--white);
+  margin-top: 24px;
+}
+
+.nw-embed iframe {
+  display: block;
+  width: 100%;
+  height: 78vh;
+  min-height: 560px;
+  border: 0;
+}
+
 /* ---------------- directory ---------------- */
 .nw-dir-controls {
   display: flex;

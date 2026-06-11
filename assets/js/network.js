@@ -191,6 +191,11 @@
     });
     if (name === "map") initMainMap();
     if (name === "add") initFormMap();
+    if (name === "regional") {
+      // load the external dashboard only when first viewed
+      var frame = document.getElementById("nw-regional-frame");
+      if (frame && !frame.src) frame.src = frame.dataset.src;
+    }
   }
 
   tabs.forEach(function (t) {
