@@ -244,14 +244,35 @@
     document.getElementById("nw-org-breakdown").innerHTML =
       Object.keys(orgs).sort().map(function (org) {
         var rows = sites.filter(function (s) { return s.org === org; });
+        var toReview = rows.filter(function (s) { return !s.verified; }).length;
         return '<div class="nw-org-row"><strong>' + esc(org) + "</strong>" +
           '<span class="nw-org-types">' + rows.map(function (s) {
             return '<span class="nw-chip" style="--chip:' + typeInfo(s.type).color + '">' +
                    esc(typeInfo(s.type).label.split(" (")[0]) + "</span>";
-          }).join("") + "</span></div>";
+          }).join("") +
+          (toReview
+            ? '<button class="nw-review-link" data-review-org="' + esc(org) + '">' +
+              toReview + " to verify &rarr;</button>"
+            : '<span class="nw-review-done">all verified</span>') +
+          "</span></div>";
       }).join("");
 
+    document.querySelectorAll("[data-review-org]").forEach(function (b) {
+      b.addEventListener("click", function () { startReview(b.dataset.reviewOrg); });
+    });
+
     renderInsights();
+  }
+
+  function startReview(org) {
+    showView("directory");
+    scrollToApp();
+    dirSearch.value = "";
+    dirType.value = "";
+    renderDirectory(); // ensure the org dropdown is built before selecting
+    document.getElementById("nw-dir-org").value = org;
+    document.getElementById("nw-dir-review").checked = true;
+    renderDirectory();
   }
 
   function renderInsights() {
@@ -379,6 +400,8 @@
 
   var dirSearch = document.getElementById("nw-dir-search");
   var dirType = document.getElementById("nw-dir-type");
+  var dirOrg = document.getElementById("nw-dir-org");
+  var dirReview = document.getElementById("nw-dir-review");
 
   dirType.innerHTML = '<option value="">All roles</option>' +
     Object.keys(TYPES).map(function (t) {
@@ -387,12 +410,32 @@
 
   dirSearch.addEventListener("input", renderDirectory);
   dirType.addEventListener("change", renderDirectory);
+  dirOrg.addEventListener("change", renderDirectory);
+  dirReview.addEventListener("change", renderDirectory);
+
+  function rebuildOrgFilter() {
+    var orgs = {};
+    sites.forEach(function (s) { orgs[s.org] = true; });
+    var names = Object.keys(orgs).sort();
+    var sig = names.join("|");
+    if (dirOrg.dataset.sig === sig) return;
+    var prev = dirOrg.value;
+    dirOrg.dataset.sig = sig;
+    dirOrg.innerHTML = '<option value="">All organizations</option>' +
+      names.map(function (o) { return '<option value="' + esc(o) + '">' + esc(o) + "</option>"; }).join("");
+    if (names.indexOf(prev) !== -1) dirOrg.value = prev;
+  }
 
   function renderDirectory() {
+    rebuildOrgFilter();
     var q = dirSearch.value.toLowerCase().trim();
     var t = dirType.value;
+    var o = dirOrg.value;
+    var reviewOnly = dirReview.checked;
     var list = sites.filter(function (s) {
       if (t && s.type !== t) return false;
+      if (o && s.org !== o) return false;
+      if (reviewOnly && s.verified) return false;
       if (!q) return true;
       return [s.org, s.siteName, s.address, s.products, s.needsServed, s.offersNeeds, s.notes]
         .join(" ").toLowerCase().indexOf(q) !== -1;
@@ -505,9 +548,50 @@
   function setFormPin(lat, lng) {
     if (!formMap) return;
     if (formMarker) formMarker.setLatLng([lat, lng]);
-    else formMarker = L.marker([lat, lng]).addTo(formMap);
+    else {
+      formMarker = L.marker([lat, lng], { draggable: true }).addTo(formMap);
+      formMarker.on("dragend", function () {
+        var p = formMarker.getLatLng();
+        document.getElementById("f-lat").value = p.lat.toFixed(5);
+        document.getElementById("f-lng").value = p.lng.toFixed(5);
+      });
+    }
     formMap.panTo([lat, lng]);
   }
+
+  document.getElementById("nw-geocode").addEventListener("click", function () {
+    var addr = getVal("f-address");
+    var msg = document.getElementById("nw-geocode-msg");
+    if (!addr) {
+      msg.textContent = "Type a street address first (in The Basics above).";
+      msg.className = "nw-form-msg is-error";
+      return;
+    }
+    msg.textContent = "Looking up address…";
+    msg.className = "nw-form-msg";
+    fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=us&q=" +
+          encodeURIComponent(addr))
+      .then(function (r) { return r.json(); })
+      .then(function (results) {
+        if (!results || !results.length) {
+          msg.textContent = "Address not found — add city & ZIP, or click the map instead.";
+          msg.className = "nw-form-msg is-error";
+          return;
+        }
+        var lat = parseFloat(results[0].lat), lng = parseFloat(results[0].lon);
+        document.getElementById("f-lat").value = lat.toFixed(5);
+        document.getElementById("f-lng").value = lng.toFixed(5);
+        initFormMap();
+        setFormPin(lat, lng);
+        if (formMap) formMap.setView([lat, lng], 16);
+        msg.textContent = "Pin placed — check it, and drag it if it's slightly off.";
+        msg.className = "nw-form-msg is-ok";
+      })
+      .catch(function () {
+        msg.textContent = "Lookup unavailable — click the map to place the pin instead.";
+        msg.className = "nw-form-msg is-error";
+      });
+  });
 
   function startEdit(id) {
     var s = byId(id);
@@ -628,6 +712,40 @@
     dataStatus("Exported " + sites.length + " sites" +
       (live ? " — a snapshot of the live network for analysis or backup." :
               ". Email the file to ryanyamauchi@sfua.org to merge it into the shared baseline."));
+  });
+
+  document.getElementById("nw-export-csv").addEventListener("click", function () {
+    var cols = [
+      ["Organization", "org"], ["Site name", "siteName"], ["Role", null],
+      ["Address", "address"], ["Latitude", "lat"], ["Longitude", "lng"],
+      ["Products", "products"], ["Capacity", "capacity"],
+      ["Cold storage", null], ["Cold storage details", "coldStorageDetails"],
+      ["Transport", "transport"], ["Schedule", "schedule"],
+      ["Existing commitments", "contracts"], ["Currently serves", "needsServed"],
+      ["Offers / needs", "offersNeeds"],
+      ["Contact name", "contactName"], ["Contact email", "contactEmail"],
+      ["Notes", "notes"], ["Verified", null],
+      ["Last updated", "updatedAt"], ["Updated by", "updatedBy"]
+    ];
+    function cell(v) {
+      return '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
+    }
+    var lines = [cols.map(function (c) { return cell(c[0]); }).join(",")];
+    sites.forEach(function (s) {
+      lines.push(cols.map(function (c) {
+        if (c[0] === "Role") return cell(typeInfo(s.type).label);
+        if (c[0] === "Cold storage") return cell(s.coldStorage ? "yes" : "no");
+        if (c[0] === "Verified") return cell(s.verified ? "yes" : "no");
+        return cell(s[c[1]]);
+      }).join(","));
+    });
+    var blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "sfua-food-network-" + new Date().toISOString().slice(0, 10) + ".csv";
+    a.click();
+    URL.revokeObjectURL(a.href);
+    dataStatus("Exported " + sites.length + " sites as CSV — opens directly in Excel or Google Sheets.");
   });
 
   document.getElementById("nw-import").addEventListener("change", function (e) {

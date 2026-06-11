@@ -157,6 +157,10 @@
         <div class="nw-dir-controls">
           <input type="search" id="nw-dir-search" placeholder="Search sites, organizations, products&hellip;" aria-label="Search directory" />
           <select id="nw-dir-type" aria-label="Filter by site role"></select>
+          <select id="nw-dir-org" aria-label="Filter by organization"></select>
+          <label class="nw-review-toggle">
+            <input type="checkbox" id="nw-dir-review" /> Needs review only
+          </label>
         </div>
         <div class="nw-dir-list" id="nw-dir-list"></div>
       </div>
@@ -237,7 +241,11 @@
 
           <fieldset>
             <legend>Location on the map</legend>
-            <p class="nw-muted">Click the map to drop the pin, or type coordinates if you know them.</p>
+            <p class="nw-muted">Type the street address above, then use the lookup — or click the map to drop the pin by hand. The pin is draggable.</p>
+            <div class="nw-geocode-row">
+              <button type="button" class="btn btn--ghost nw-btn-sm" id="nw-geocode">Find Address on Map</button>
+              <span class="nw-form-msg" id="nw-geocode-msg" role="status"></span>
+            </div>
             <div id="nw-form-map" class="nw-map nw-map--small"></div>
             <div class="nw-grid-2">
               <label>Latitude <input type="number" step="any" id="f-lat" placeholder="34.05" /></label>
@@ -346,6 +354,7 @@
           <h3>Your data</h3>
           <div class="nw-data-actions">
             <button class="btn btn--primary" id="nw-export">Export (JSON)</button>
+            <button class="btn btn--ghost" id="nw-export-csv">Export (CSV)</button>
             <label class="btn btn--ghost nw-import-label" id="nw-import-label">
               Import a Data File
               <input type="file" id="nw-import" accept=".json,application/json" hidden />
