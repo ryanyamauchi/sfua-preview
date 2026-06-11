@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LA Regional Food Network — Solutions for Urban Agriculture</title>
+  <meta name="description" content="A shared map of producer, storage, and distribution infrastructure across LA County, built with partners to coordinate local produce for local buyers." />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="assets/css/network.css" />
+</head>
+<body>
+
+  <!-- ============================================================
+       NAV
+       ============================================================ -->
+  <header class="site-nav" role="banner">
+    <div class="container">
+      <a href="index.html" class="nav-logo" aria-label="SFUA Home">
+        <span class="logo-abbr">SFUA</span>
+        <span class="logo-full">Solutions for Urban Agriculture</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="production.html">Production</a>
+        <a href="education.html">Education</a>
+        <a href="distribution.html">Distribution</a>
+        <a href="harvest-moon.html">Harvest Moon</a>
+        <a href="network.html" aria-current="page">Food Network</a>
+      </nav>
+      <div class="nav-cta">
+        <a href="#add" class="btn btn--primary nw-jump-add">Add Your Sites</a>
+      </div>
+      <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+
+  <!-- ============================================================
+       HERO
+       ============================================================ -->
+  <section class="page-hero" aria-labelledby="network-hero-heading">
+    <div class="container">
+      <div class="page-hero-content nw-hero-content">
+        <span class="eyebrow">A Shared Tool for Partners</span>
+        <h1 id="network-hero-heading">The LA Regional <em>Food Network</em></h1>
+        <p class="lead">
+          One shared picture of the infrastructure we already have: who grows,
+          who stores, who moves, and who serves food across LA County. Each
+          partner enters its own sites; together the map shows where local
+          produce can reach local buyers — strengthening the local economy and
+          sustaining local growers, without disturbing the operations,
+          contracts, and needs each organization already serves.
+        </p>
+        <div class="hero-actions">
+          <a href="#add" class="btn btn--primary nw-jump-add">Add Your Sites</a>
+          <a href="#map" class="btn btn--outline nw-jump-map">View the Map</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       APP
+       ============================================================ -->
+  <section class="section section--white nw-app-section" aria-label="Food network application">
+    <div class="container">
+
+      <div class="nw-tabs" role="tablist" aria-label="Network views">
+        <button class="nw-tab is-active" data-view="dashboard" role="tab" aria-selected="true">Dashboard</button>
+        <button class="nw-tab" data-view="map" role="tab" aria-selected="false">Map</button>
+        <button class="nw-tab" data-view="directory" role="tab" aria-selected="false">Directory</button>
+        <button class="nw-tab" data-view="add" role="tab" aria-selected="false">Add a Site</button>
+        <button class="nw-tab" data-view="data" role="tab" aria-selected="false">Data &amp; Sharing</button>
+      </div>
+
+      <!-- ---------------- DASHBOARD ---------------- -->
+      <div class="nw-view is-active" id="view-dashboard" role="tabpanel">
+        <div class="section-header">
+          <span class="eyebrow">Network at a Glance</span>
+          <h2>What the network holds today</h2>
+        </div>
+
+        <div class="nw-stat-grid" id="nw-stats"></div>
+
+        <div class="nw-panel">
+          <h3>Sites by organization</h3>
+          <div id="nw-org-breakdown"></div>
+        </div>
+
+        <div class="nw-panel">
+          <h3>Network signals <span class="nw-badge nw-badge--proto">prototype</span></h3>
+          <p class="nw-muted">
+            Simple distance-based observations to start the optimization
+            conversation — they get more useful as real capacities, schedules,
+            and commitments are entered. They never override an organization's
+            existing contracts or the needs it already serves.
+          </p>
+          <div id="nw-insights"></div>
+        </div>
+      </div>
+
+      <!-- ---------------- MAP ---------------- -->
+      <div class="nw-view" id="view-map" role="tabpanel" hidden>
+        <div class="section-header">
+          <span class="eyebrow">Infrastructure Map</span>
+          <h2>The network across LA County</h2>
+        </div>
+        <div class="nw-map-filters" id="nw-map-filters" aria-label="Filter map by site role"></div>
+        <div id="nw-map" class="nw-map" aria-label="Map of network sites"></div>
+        <p class="nw-muted nw-map-note">
+          Faded pins are unverified placeholders from the June 2026 convening —
+          each organization replaces them with real entries. Click a pin for details.
+        </p>
+      </div>
+
+      <!-- ---------------- DIRECTORY ---------------- -->
+      <div class="nw-view" id="view-directory" role="tabpanel" hidden>
+        <div class="section-header">
+          <span class="eyebrow">Site Directory</span>
+          <h2>Every site in the network</h2>
+        </div>
+        <div class="nw-dir-controls">
+          <input type="search" id="nw-dir-search" placeholder="Search sites, organizations, products&hellip;" aria-label="Search directory" />
+          <select id="nw-dir-type" aria-label="Filter by site role"></select>
+        </div>
+        <div class="nw-dir-list" id="nw-dir-list"></div>
+      </div>
+
+      <!-- ---------------- ADD / EDIT ---------------- -->
+      <div class="nw-view" id="view-add" role="tabpanel" hidden>
+        <div class="section-header">
+          <span class="eyebrow">Partner Input</span>
+          <h2 id="nw-form-heading">Add a site to the network</h2>
+        </div>
+        <p class="nw-muted">
+          Enter each physical site separately — a farm, a cold-storage room, a
+          loading dock, a kitchen, a market. Share what you're comfortable
+          sharing; every field except the first three is optional and can be
+          filled in later.
+        </p>
+
+        <form id="nw-form" class="nw-form" novalidate>
+          <input type="hidden" id="f-id" />
+
+          <fieldset>
+            <legend>The basics</legend>
+            <div class="nw-grid-2">
+              <label>Organization <span class="nw-req">*</span>
+                <input type="text" id="f-org" required placeholder="e.g., Hollywood Food Coalition" />
+              </label>
+              <label>Site name <span class="nw-req">*</span>
+                <input type="text" id="f-siteName" required placeholder="e.g., Gower St. kitchen" />
+              </label>
+            </div>
+            <div class="nw-grid-2">
+              <label>Role of this site <span class="nw-req">*</span>
+                <select id="f-type" required></select>
+              </label>
+              <label>Street address
+                <input type="text" id="f-address" placeholder="Street, City, CA ZIP" />
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Location on the map</legend>
+            <p class="nw-muted">Click the map to drop the pin, or type coordinates if you know them.</p>
+            <div id="nw-form-map" class="nw-map nw-map--small"></div>
+            <div class="nw-grid-2">
+              <label>Latitude <input type="number" step="any" id="f-lat" placeholder="34.05" /></label>
+              <label>Longitude <input type="number" step="any" id="f-lng" placeholder="-118.24" /></label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>What moves through this site</legend>
+            <label>Products / food handled
+              <input type="text" id="f-products" placeholder="e.g., leafy greens, citrus, prepared meals, recovered food" />
+            </label>
+            <label>Capacity &amp; volume
+              <input type="text" id="f-capacity" placeholder="e.g., 2,000 lbs/week, 600 meals/day, 12 pallet positions" />
+            </label>
+            <div class="nw-grid-2">
+              <label class="nw-check">
+                <input type="checkbox" id="f-coldStorage" /> Cold storage at this site
+              </label>
+              <label>Cold storage details
+                <input type="text" id="f-coldStorageDetails" placeholder="e.g., walk-in cooler 400 sq ft, freezer 100 sq ft" />
+              </label>
+            </div>
+            <div class="nw-grid-2">
+              <label>Transport assets
+                <input type="text" id="f-transport" placeholder="e.g., 1 refrigerated box truck, 2 vans" />
+              </label>
+              <label>Schedule / days of operation
+                <input type="text" id="f-schedule" placeholder="e.g., Tue &amp; Fri receiving, M–F 7am–3pm" />
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Commitments &amp; needs — so nothing gets disturbed</legend>
+            <label>Existing contracts &amp; commitments
+              <textarea id="f-contracts" rows="2" placeholder="Standing orders, grant deliverables, supplier agreements this site must continue to honor"></textarea>
+            </label>
+            <label>Who this site currently serves
+              <textarea id="f-needsServed" rows="2" placeholder="Populations, programs, or buyers depending on this site today"></textarea>
+            </label>
+            <label>Surplus you could offer / gaps you need filled
+              <textarea id="f-offersNeeds" rows="2" placeholder="e.g., excess summer squash Jul–Sep; need cold storage near 90044; spare truck capacity on Thursdays"></textarea>
+            </label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Contact &amp; notes</legend>
+            <div class="nw-grid-2">
+              <label>Contact name <input type="text" id="f-contactName" /></label>
+              <label>Contact email <input type="email" id="f-contactEmail" /></label>
+            </div>
+            <label>Anything else
+              <textarea id="f-notes" rows="2"></textarea>
+            </label>
+            <label class="nw-check">
+              <input type="checkbox" id="f-verified" />
+              This entry is confirmed accurate by our organization
+            </label>
+          </fieldset>
+
+          <div class="nw-form-actions">
+            <button type="submit" class="btn btn--primary" id="nw-form-submit">Save Site</button>
+            <button type="button" class="btn btn--outline" id="nw-form-reset">Clear Form</button>
+            <span class="nw-form-msg" id="nw-form-msg" role="status"></span>
+          </div>
+        </form>
+      </div>
+
+      <!-- ---------------- DATA & SHARING ---------------- -->
+      <div class="nw-view" id="view-data" role="tabpanel" hidden>
+        <div class="section-header">
+          <span class="eyebrow">Data &amp; Sharing</span>
+          <h2>How the shared picture stays shared</h2>
+        </div>
+
+        <div class="nw-panel">
+          <h3>How it works right now</h3>
+          <ol class="nw-steps">
+            <li><strong>Enter your sites</strong> in the Add a Site tab. They save in this browser immediately.</li>
+            <li><strong>Export your data</strong> below and email the file to
+              <a href="mailto:ryanyamauchi@sfua.org">ryanyamauchi@sfua.org</a>.</li>
+            <li><strong>SFUA merges</strong> every partner's file into the shared baseline that this page loads for everyone — and uses the combined dataset for network modeling and optimization.</li>
+          </ol>
+          <p class="nw-muted">
+            This is the prototype workflow for a static site. When the group is
+            ready, the same form can write to a live shared database so updates
+            appear for everyone instantly.
+          </p>
+        </div>
+
+        <div class="nw-panel">
+          <h3>Your data</h3>
+          <div class="nw-data-actions">
+            <button class="btn btn--primary" id="nw-export">Export My Data (JSON)</button>
+            <label class="btn btn--outline nw-import-label">
+              Import a Data File
+              <input type="file" id="nw-import" accept=".json,application/json" hidden />
+            </label>
+            <button class="btn btn--outline" id="nw-reset-baseline">Reset to Shared Baseline</button>
+          </div>
+          <p class="nw-muted" id="nw-data-status"></p>
+        </div>
+
+        <div class="nw-panel">
+          <h3>Data principles</h3>
+          <ul class="nw-principles">
+            <li>Each organization owns its entries and shares only what it chooses to.</li>
+            <li>Existing contracts and the people currently served are recorded so coordination never disrupts them.</li>
+            <li>The shared dataset exists to optimize the whole network: matching local growers to local buyers, filling storage and transport gaps, and keeping the operation in the black.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="site-footer section--dark" role="contentinfo">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <span class="logo-abbr">SFUA</span>
+          <span class="logo-full">Solutions for Urban Agriculture</span>
+          <p>
+            Building a regional food system across Southern California through
+            partner farms, education, and community-centered food distribution.
+          </p>
+        </div>
+        <div class="footer-col">
+          <h5>Food Network</h5>
+          <ul>
+            <li><a href="#map" class="nw-jump-map">Infrastructure Map</a></li>
+            <li><a href="#add" class="nw-jump-add">Add Your Sites</a></li>
+            <li><a href="mailto:ryanyamauchi@sfua.org">Contact SFUA</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Programs</h5>
+          <ul>
+            <li><a href="production.html">Agricultural Production</a></li>
+            <li><a href="education.html">Education Programs</a></li>
+            <li><a href="distribution.html">Food Distribution</a></li>
+            <li><a href="harvest-moon.html">Harvest Moon</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Solutions for Urban Agriculture</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="assets/data/sites.seed.js"></script>
+  <script src="assets/js/network.js"></script>
+</body>
+</html>
