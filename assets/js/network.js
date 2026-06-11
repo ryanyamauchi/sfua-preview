@@ -15,7 +15,7 @@
 (function () {
   "use strict";
 
-  var STORE_KEY = "sfua-network-sites-v2";
+  var STORE_KEY = "sfua-network-sites-v3";
 
   var TYPES = {
     producer:     { label: "Producer (farm / garden / grower)", color: "#3DF0A4" },
