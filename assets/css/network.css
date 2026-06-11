@@ -5,6 +5,9 @@
 
 .nw-hero-content { max-width: 720px; }
 
+/* The hidden attribute always wins, even over display rules below */
+.nw-app-section [hidden] { display: none !important; }
+
 .nw-app-section { padding-top: 48px; }
 
 /* ---------------- tabs ---------------- */
@@ -339,6 +342,78 @@
 }
 
 .nw-import-label { cursor: pointer; }
+
+/* ---------------- auth & sign-in ---------------- */
+.nw-authbar { margin-bottom: 32px; }
+
+.nw-auth {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 18px;
+  font-size: 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px 20px;
+}
+
+.nw-auth--local { background: var(--straw); }
+.nw-auth--in    { background: var(--sage-light); border-color: var(--sage); }
+.nw-auth--out   { background: var(--linen); }
+
+.nw-auth code {
+  font-size: 0.82rem;
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 1px 6px;
+}
+
+.nw-live-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--sage);
+  margin-right: 8px;
+  vertical-align: 1px;
+}
+
+.nw-locked { display: flex; justify-content: center; padding: 32px 0 48px; }
+
+.nw-locked-box {
+  max-width: 460px;
+  width: 100%;
+  text-align: center;
+  background: var(--linen);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 48px 40px;
+  box-shadow: var(--shadow-sm);
+}
+
+.nw-locked-box h2 { margin-bottom: 12px; }
+.nw-locked-box .nw-muted { margin: 0 auto 8px; }
+
+.nw-signin {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 24px 0 12px;
+}
+
+.nw-signin input {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--soil);
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  transition: border-color 0.2s;
+}
+
+.nw-signin input:focus { border-color: var(--clay); outline: none; }
 
 /* ---------------- responsive ---------------- */
 @media (max-width: 720px) {

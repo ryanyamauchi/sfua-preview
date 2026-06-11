@@ -1,7 +1,16 @@
 /* ============================================================
    SFUA — LA Regional Food Network
-   Front-end app: shared baseline + browser-local edits,
-   with JSON export/import for merging partner data.
+   Front-end app.
+
+   Two data modes, detected at load:
+   - LIVE: assets/data/config.js has Supabase credentials.
+     Sites live in a shared database; anyone can view, signed-in
+     partners can add/edit, and changes sync to every open
+     browser in real time.
+   - LOCAL (prototype fallback): no credentials configured.
+     Sites save in this browser's localStorage, starting from
+     the shared baseline in assets/data/sites.seed.js, with
+     JSON export/import for sharing.
    ============================================================ */
 (function () {
   "use strict";
@@ -23,9 +32,13 @@
 
   /* ---------------- data layer ---------------- */
 
-  var sites = load();
+  var cfg = window.SFUA_CONFIG || {};
+  var live = !!(cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY && window.supabase);
+  var sb = live ? window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY) : null;
+  var user = null;
+  var sites = live ? [] : loadLocal();
 
-  function load() {
+  function loadLocal() {
     try {
       var raw = localStorage.getItem(STORE_KEY);
       if (raw) return JSON.parse(raw);
@@ -33,8 +46,67 @@
     return (window.SFUA_SEED_SITES || []).slice();
   }
 
-  function persist() {
+  function persistLocal() {
+    if (live) return;
     try { localStorage.setItem(STORE_KEY, JSON.stringify(sites)); } catch (e) {}
+  }
+
+  function canEdit() { return !live || !!user; }
+
+  function fromRow(r) {
+    return {
+      id: r.id, org: r.org, siteName: r.site_name, type: r.type,
+      address: r.address, lat: r.lat, lng: r.lng,
+      products: r.products, capacity: r.capacity,
+      coldStorage: !!r.cold_storage, coldStorageDetails: r.cold_storage_details,
+      transport: r.transport, schedule: r.schedule,
+      contracts: r.contracts, needsServed: r.needs_served, offersNeeds: r.offers_needs,
+      contactName: r.contact_name, contactEmail: r.contact_email,
+      notes: r.notes, verified: !!r.verified,
+      updatedBy: r.updated_by,
+      updatedAt: (r.updated_at || "").slice(0, 10)
+    };
+  }
+
+  function toRow(s) {
+    return {
+      org: s.org, site_name: s.siteName, type: s.type,
+      address: s.address || null, lat: s.lat, lng: s.lng,
+      products: s.products || null, capacity: s.capacity || null,
+      cold_storage: !!s.coldStorage, cold_storage_details: s.coldStorageDetails || null,
+      transport: s.transport || null, schedule: s.schedule || null,
+      contracts: s.contracts || null, needs_served: s.needsServed || null,
+      offers_needs: s.offersNeeds || null,
+      contact_name: s.contactName || null, contact_email: s.contactEmail || null,
+      notes: s.notes || null, verified: !!s.verified
+    };
+  }
+
+  function fetchSites() {
+    return sb.from("sites").select("*").order("org").then(function (res) {
+      if (res.error) {
+        authNotice("Couldn't reach the live database (" + res.error.message + "). Showing nothing until it reconnects.");
+        return;
+      }
+      sites = res.data.map(fromRow);
+    });
+  }
+
+  function subscribeRealtime() {
+    return sb.channel("sites-live")
+      .on("postgres_changes", { event: "*", schema: "public", table: "sites" }, function (p) {
+        if (p.eventType === "DELETE") {
+          sites = sites.filter(function (s) { return s.id !== p.old.id; });
+        } else {
+          var s = fromRow(p.new), found = false;
+          for (var i = 0; i < sites.length; i++) {
+            if (sites[i].id === s.id) { sites[i] = s; found = true; break; }
+          }
+          if (!found) sites.push(s);
+        }
+        renderAll();
+      })
+      .subscribe();
   }
 
   function uid() {
@@ -59,6 +131,48 @@
   }
 
   function hasCoords(s) { return typeof s.lat === "number" && typeof s.lng === "number"; }
+
+  /* ---------------- auth bar ---------------- */
+
+  var authBar = document.getElementById("nw-authbar");
+
+  function renderAuthBar() {
+    if (!live) {
+      authBar.innerHTML =
+        '<div class="nw-auth nw-auth--local">' +
+        "<span><strong>Prototype mode</strong> — entries save in this browser only. " +
+        "Live shared logins aren't connected yet (see <code>SETUP-LIVE-DATABASE.md</code>).</span></div>";
+      return;
+    }
+    if (user) {
+      authBar.innerHTML =
+        '<div class="nw-auth nw-auth--in">' +
+        '<span><span class="nw-live-dot" aria-hidden="true"></span><strong>Live network</strong> — signed in as ' +
+        "<strong>" + esc(user.email) + "</strong>. Your changes appear for all partners instantly.</span>" +
+        '<button class="btn btn--outline nw-btn-sm" id="nw-signout">Sign out</button></div>';
+      document.getElementById("nw-signout").addEventListener("click", function () {
+        sb.auth.signOut();
+      });
+      return;
+    }
+    authBar.innerHTML =
+      '<div class="nw-auth nw-auth--out">' +
+      '<span><span class="nw-live-dot" aria-hidden="true"></span><strong>Private partner network</strong> — ' +
+      "sign in below to view and edit.</span></div>";
+  }
+
+  function renderLock() {
+    var locked = live && !user;
+    document.getElementById("nw-app-body").hidden = locked;
+    document.getElementById("nw-locked").hidden = !locked;
+  }
+
+  function authNotice(text) {
+    var el = document.createElement("div");
+    el.className = "nw-auth nw-auth--local";
+    el.innerHTML = "<span>" + esc(text) + "</span>";
+    authBar.appendChild(el);
+  }
 
   /* ---------------- tabs ---------------- */
 
@@ -277,6 +391,9 @@
     });
 
     document.getElementById("nw-dir-list").innerHTML = list.length ? list.map(function (s) {
+      var updated = s.updatedAt
+        ? s.updatedAt + (s.updatedBy ? " by " + s.updatedBy : "")
+        : "";
       return '<article class="nw-card" style="--chip:' + typeInfo(s.type).color + '">' +
         '<div class="nw-card-head">' +
           "<div><h3>" + esc(s.siteName) + "</h3>" +
@@ -295,24 +412,40 @@
         cardRow("Currently serves", s.needsServed) +
         cardRow("Offers / needs", s.offersNeeds) +
         cardRow("Notes", s.notes) +
-        '<div class="nw-card-actions">' +
-          '<button class="btn btn--outline nw-btn-sm" data-edit="' + esc(s.id) + '">Edit</button>' +
-          '<button class="btn btn--outline nw-btn-sm nw-btn-danger" data-remove="' + esc(s.id) + '">Remove</button>' +
-        "</div></article>";
+        cardRow("Last updated", updated) +
+        (canEdit()
+          ? '<div class="nw-card-actions">' +
+            '<button class="btn btn--outline nw-btn-sm" data-edit="' + esc(s.id) + '">Edit</button>' +
+            '<button class="btn btn--outline nw-btn-sm nw-btn-danger" data-remove="' + esc(s.id) + '">Remove</button>' +
+            "</div>"
+          : "") +
+        "</article>";
     }).join("") : '<p class="nw-muted">No sites match. Try clearing the filters, or add the first one in the Add a Site tab.</p>';
 
     document.querySelectorAll("[data-edit]").forEach(function (b) {
       b.addEventListener("click", function () { startEdit(b.dataset.edit); });
     });
     document.querySelectorAll("[data-remove]").forEach(function (b) {
-      b.addEventListener("click", function () {
-        var s = byId(b.dataset.remove);
-        if (s && confirm('Remove "' + s.siteName + '" from your local copy of the network?')) {
-          sites = sites.filter(function (x) { return x.id !== s.id; });
-          persist(); renderAll();
-        }
-      });
+      b.addEventListener("click", function () { removeSite(b.dataset.remove); });
     });
+  }
+
+  function removeSite(id) {
+    var s = byId(id);
+    if (!s) return;
+    var warning = live
+      ? 'Remove "' + s.siteName + '" from the live network for ALL partners?'
+      : 'Remove "' + s.siteName + '" from your local copy of the network?';
+    if (!confirm(warning)) return;
+    if (live) {
+      sb.from("sites").delete().eq("id", id).then(function (res) {
+        if (res.error) alert("Couldn't remove: " + res.error.message);
+        else { sites = sites.filter(function (x) { return x.id !== id; }); renderAll(); }
+      });
+    } else {
+      sites = sites.filter(function (x) { return x.id !== id; });
+      persistLocal(); renderAll();
+    }
   }
 
   function cardRow(label, val) {
@@ -334,8 +467,14 @@
       return '<option value="' + t + '">' + esc(TYPES[t].label) + "</option>";
     }).join("");
 
+  function renderFormGate() {
+    var locked = !canEdit();
+    document.getElementById("nw-add-gate").hidden = !locked;
+    form.hidden = locked;
+  }
+
   function initFormMap() {
-    if (!window.L) return;
+    if (!window.L || form.hidden) return;
     if (!formMap) {
       formMap = L.map("nw-form-map").setView(LA_CENTER, 9);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -393,15 +532,13 @@
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     var org = getVal("f-org"), siteName = getVal("f-siteName"), type = getVal("f-type");
-    var msg = document.getElementById("nw-form-msg");
     if (!org || !siteName || !type) {
-      msg.textContent = "Organization, site name, and role are required.";
-      msg.className = "nw-form-msg is-error";
+      formMsg("Organization, site name, and role are required.", true);
       return;
     }
     var lat = parseFloat(getVal("f-lat")), lng = parseFloat(getVal("f-lng"));
     var entry = {
-      id: getVal("f-id") || uid(),
+      id: getVal("f-id"),
       org: org, siteName: siteName, type: type,
       address: getVal("f-address"),
       lat: isNaN(lat) ? null : lat, lng: isNaN(lng) ? null : lng,
@@ -413,17 +550,44 @@
       offersNeeds: getVal("f-offersNeeds"),
       contactName: getVal("f-contactName"), contactEmail: getVal("f-contactEmail"),
       notes: getVal("f-notes"),
-      verified: document.getElementById("f-verified").checked,
-      updatedAt: new Date().toISOString().slice(0, 10)
+      verified: document.getElementById("f-verified").checked
     };
-    var idx = sites.map(function (s) { return s.id; }).indexOf(entry.id);
-    if (idx >= 0) sites[idx] = entry; else sites.push(entry);
-    persist();
-    resetForm();
-    renderAll();
-    msg.textContent = '"' + entry.siteName + '" saved. Add another, or export from Data & Sharing when you\'re done.';
-    msg.className = "nw-form-msg is-ok";
+
+    if (live) {
+      if (!user) { formMsg("Please sign in first.", true); return; }
+      var row = toRow(entry);
+      row.updated_by = user.email;
+      var query;
+      if (entry.id) {
+        query = sb.from("sites").update(row).eq("id", entry.id);
+      } else {
+        row.created_by = user.email;
+        query = sb.from("sites").insert(row);
+      }
+      formMsg("Saving…", false);
+      query.then(function (res) {
+        if (res.error) { formMsg("Couldn't save: " + res.error.message, true); return; }
+        fetchSites().then(renderAll);
+        resetForm();
+        formMsg('"' + entry.siteName + '" saved to the live network — every partner can see it now.', false);
+      });
+    } else {
+      entry.id = entry.id || uid();
+      entry.updatedAt = new Date().toISOString().slice(0, 10);
+      var idx = sites.map(function (s) { return s.id; }).indexOf(entry.id);
+      if (idx >= 0) sites[idx] = entry; else sites.push(entry);
+      persistLocal();
+      resetForm();
+      renderAll();
+      formMsg('"' + entry.siteName + '" saved in this browser. Export from Data & Sharing when you\'re done.', false);
+    }
   });
+
+  function formMsg(text, isError) {
+    var msg = document.getElementById("nw-form-msg");
+    msg.textContent = text;
+    msg.className = "nw-form-msg " + (isError ? "is-error" : "is-ok");
+  }
 
   document.getElementById("nw-form-reset").addEventListener("click", resetForm);
 
@@ -436,10 +600,18 @@
 
   /* ---------------- data & sharing ---------------- */
 
+  function renderDataPanel() {
+    document.getElementById("nw-flow-live").hidden = !live;
+    document.getElementById("nw-flow-local").hidden = live;
+    document.getElementById("nw-reset-baseline").hidden = live;
+    // Bulk import writes to the shared database, so it needs a login
+    document.getElementById("nw-import-label").hidden = live && !user;
+  }
+
   document.getElementById("nw-export").addEventListener("click", function () {
     var payload = {
       exported: new Date().toISOString(),
-      source: "SFUA LA Regional Food Network (prototype)",
+      source: "SFUA LA Regional Food Network" + (live ? " (live)" : " (prototype)"),
       sites: sites
     };
     var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
@@ -448,7 +620,9 @@
     a.download = "sfua-food-network-" + new Date().toISOString().slice(0, 10) + ".json";
     a.click();
     URL.revokeObjectURL(a.href);
-    dataStatus("Exported " + sites.length + " sites. Email the file to ryanyamauchi@sfua.org to merge it into the shared baseline.");
+    dataStatus("Exported " + sites.length + " sites" +
+      (live ? " — a snapshot of the live network for analysis or backup." :
+              ". Email the file to ryanyamauchi@sfua.org to merge it into the shared baseline."));
   });
 
   document.getElementById("nw-import").addEventListener("change", function (e) {
@@ -458,17 +632,34 @@
     reader.onload = function () {
       try {
         var data = JSON.parse(reader.result);
-        var incoming = Array.isArray(data) ? data : data.sites;
-        if (!Array.isArray(incoming)) throw new Error("no sites array");
-        var ids = {}, added = 0, updated = 0;
-        sites.forEach(function (s, i) { ids[s.id] = i; });
-        incoming.forEach(function (s) {
-          if (!s || !s.id || !s.siteName) return;
-          if (s.id in ids) { sites[ids[s.id]] = s; updated++; }
-          else { sites.push(s); added++; }
+        var incoming = (Array.isArray(data) ? data : data.sites).filter(function (s) {
+          return s && s.siteName && s.org && s.type;
         });
-        persist(); renderAll();
-        dataStatus("Imported: " + added + " new sites, " + updated + " updated.");
+        if (!incoming.length) throw new Error("no sites");
+        if (live) {
+          if (!user) { dataStatus("Sign in first — importing writes to the live network."); return; }
+          if (!confirm("Add " + incoming.length + " sites from this file to the LIVE network for all partners? (Duplicates aren't detected — re-importing the same file creates copies.)")) return;
+          var rows = incoming.map(function (s) {
+            var r = toRow(s);
+            r.created_by = user.email; r.updated_by = user.email;
+            return r;
+          });
+          sb.from("sites").insert(rows).then(function (res) {
+            if (res.error) { dataStatus("Import failed: " + res.error.message); return; }
+            fetchSites().then(renderAll);
+            dataStatus("Imported " + rows.length + " sites to the live network.");
+          });
+        } else {
+          var ids = {}, added = 0, updated = 0;
+          sites.forEach(function (s, i) { ids[s.id] = i; });
+          incoming.forEach(function (s) {
+            if (!s.id) s.id = uid();
+            if (s.id in ids) { sites[ids[s.id]] = s; updated++; }
+            else { sites.push(s); added++; }
+          });
+          persistLocal(); renderAll();
+          dataStatus("Imported: " + added + " new sites, " + updated + " updated.");
+        }
       } catch (err) {
         dataStatus("That file couldn't be read as network data.");
       }
@@ -478,9 +669,10 @@
   });
 
   document.getElementById("nw-reset-baseline").addEventListener("click", function () {
+    if (live) return;
     if (!confirm("Replace your local data with the shared baseline? Sites you added here and haven't exported will be lost.")) return;
     sites = (window.SFUA_SEED_SITES || []).slice();
-    persist(); renderAll();
+    persistLocal(); renderAll();
     dataStatus("Reset to the shared baseline (" + sites.length + " sites).");
   });
 
@@ -494,7 +686,60 @@
     renderDashboard();
     renderDirectory();
     renderMarkers();
+    renderFormGate();
+    renderDataPanel();
   }
 
+  var rtChannel = null;
+
+  function connectLive() {
+    if (rtChannel) return;
+    fetchSites().then(renderAll);
+    rtChannel = subscribeRealtime();
+  }
+
+  function disconnectLive() {
+    if (rtChannel) { sb.removeChannel(rtChannel); rtChannel = null; }
+    sites = [];
+  }
+
+  function syncAuthState(nextUser) {
+    user = nextUser || null;
+    renderAuthBar();
+    renderLock();
+    if (live) {
+      if (user) connectLive();
+      else disconnectLive();
+    }
+    renderAll();
+  }
+
+  renderAuthBar();
+  renderLock();
   renderAll();
+
+  if (live) {
+    document.getElementById("nw-signin-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var msg = document.getElementById("nw-si-msg");
+      msg.textContent = "Signing in…";
+      msg.className = "nw-form-msg";
+      sb.auth.signInWithPassword({
+        email: document.getElementById("nw-si-email").value.trim(),
+        password: document.getElementById("nw-si-pass").value
+      }).then(function (res) {
+        if (res.error) {
+          msg.textContent = "Sign-in failed: " + res.error.message;
+          msg.className = "nw-form-msg is-error";
+        }
+        // success is handled by the auth state listener
+      });
+    });
+    sb.auth.getSession().then(function (r) {
+      syncAuthState(r.data && r.data.session ? r.data.session.user : null);
+    });
+    sb.auth.onAuthStateChange(function (_event, session) {
+      syncAuthState(session && session.user ? session.user : null);
+    });
+  }
 })();

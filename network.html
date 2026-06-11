@@ -69,6 +69,35 @@
   <section class="section section--white nw-app-section" aria-label="Food network application">
     <div class="container">
 
+      <div id="nw-authbar" class="nw-authbar"></div>
+
+      <!-- Sign-in screen, shown instead of the app until a partner logs in (live mode) -->
+      <div id="nw-locked" class="nw-locked" hidden>
+        <div class="nw-locked-box">
+          <span class="eyebrow">Private Partner Network</span>
+          <h2>Partner sign-in</h2>
+          <p class="nw-muted">
+            While we build this together, the network map and directory are
+            visible to signed-in partners only. Use the login SFUA provided
+            to your organization.
+          </p>
+          <form id="nw-signin-form" class="nw-signin">
+            <label class="sr-only" for="nw-si-email">Email</label>
+            <input type="email" id="nw-si-email" placeholder="you@yourorg.org" autocomplete="username" required />
+            <label class="sr-only" for="nw-si-pass">Password</label>
+            <input type="password" id="nw-si-pass" placeholder="Password" autocomplete="current-password" required />
+            <button type="submit" class="btn btn--primary">Sign In</button>
+          </form>
+          <p class="nw-form-msg" id="nw-si-msg" role="status"></p>
+          <p class="nw-muted">
+            Need a login or a password reset?
+            Email <a href="mailto:ryanyamauchi@sfua.org">ryanyamauchi@sfua.org</a>.
+          </p>
+        </div>
+      </div>
+
+      <div id="nw-app-body">
+
       <div class="nw-tabs" role="tablist" aria-label="Network views">
         <button class="nw-tab is-active" data-view="dashboard" role="tab" aria-selected="true">Dashboard</button>
         <button class="nw-tab" data-view="map" role="tab" aria-selected="false">Map</button>
@@ -142,6 +171,14 @@
           sharing; every field except the first three is optional and can be
           filled in later.
         </p>
+
+        <div id="nw-add-gate" class="nw-panel" hidden>
+          <h3>Sign in to add or edit sites</h3>
+          <p class="nw-muted">
+            Use the partner login SFUA provided, or email
+            <a href="mailto:ryanyamauchi@sfua.org">ryanyamauchi@sfua.org</a> to get one.
+          </p>
+        </div>
 
         <form id="nw-form" class="nw-form" novalidate>
           <input type="hidden" id="f-id" />
@@ -246,25 +283,38 @@
         </div>
 
         <div class="nw-panel">
-          <h3>How it works right now</h3>
-          <ol class="nw-steps">
-            <li><strong>Enter your sites</strong> in the Add a Site tab. They save in this browser immediately.</li>
-            <li><strong>Export your data</strong> below and email the file to
-              <a href="mailto:ryanyamauchi@sfua.org">ryanyamauchi@sfua.org</a>.</li>
-            <li><strong>SFUA merges</strong> every partner's file into the shared baseline that this page loads for everyone — and uses the combined dataset for network modeling and optimization.</li>
-          </ol>
-          <p class="nw-muted">
-            This is the prototype workflow for a static site. When the group is
-            ready, the same form can write to a live shared database so updates
-            appear for everyone instantly.
-          </p>
+          <h3>How it works</h3>
+          <div id="nw-flow-live" hidden>
+            <ol class="nw-steps">
+              <li><strong>Each partner signs in</strong> with the login SFUA provides — one per organization.</li>
+              <li><strong>Enter or edit your sites</strong> in the Add a Site tab. Changes save to the shared database and appear for every signed-in partner within seconds.</li>
+              <li><strong>SFUA uses the combined dataset</strong> for network modeling and optimization — matching local growers to local buyers without disturbing existing operations.</li>
+            </ol>
+            <p class="nw-muted">
+              The network is private while we build it: viewing and editing both
+              require a partner login. Need one? Email
+              <a href="mailto:ryanyamauchi@sfua.org">ryanyamauchi@sfua.org</a>.
+            </p>
+          </div>
+          <div id="nw-flow-local">
+            <ol class="nw-steps">
+              <li><strong>Enter your sites</strong> in the Add a Site tab. They save in this browser immediately.</li>
+              <li><strong>Export your data</strong> below and email the file to
+                <a href="mailto:ryanyamauchi@sfua.org">ryanyamauchi@sfua.org</a>.</li>
+              <li><strong>SFUA merges</strong> every partner's file into the shared baseline that this page loads for everyone — and uses the combined dataset for network modeling and optimization.</li>
+            </ol>
+            <p class="nw-muted">
+              Prototype mode: the live shared database with partner logins isn't
+              connected yet (see <code>SETUP-LIVE-DATABASE.md</code> in the repository).
+            </p>
+          </div>
         </div>
 
         <div class="nw-panel">
           <h3>Your data</h3>
           <div class="nw-data-actions">
             <button class="btn btn--primary" id="nw-export">Export My Data (JSON)</button>
-            <label class="btn btn--outline nw-import-label">
+            <label class="btn btn--outline nw-import-label" id="nw-import-label">
               Import a Data File
               <input type="file" id="nw-import" accept=".json,application/json" hidden />
             </label>
@@ -282,6 +332,8 @@
           </ul>
         </div>
       </div>
+
+      </div><!-- /nw-app-body -->
 
     </div>
   </section>
@@ -327,6 +379,8 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
           integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="assets/data/config.js"></script>
   <script src="assets/data/sites.seed.js"></script>
   <script src="assets/js/network.js"></script>
 </body>
