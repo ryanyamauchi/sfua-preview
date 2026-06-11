@@ -1,132 +1,287 @@
 /* ============================================================
    SFUA — LA Regional Food Network
-   Shared baseline dataset
+   Shared baseline dataset (pre-filled from public sources)
 
-   This file is the network's shared source of truth. When a
-   partner organization exports their site data from the Data &
-   Sharing tab, merge it here (or replace the array with the
-   merged export) and commit, so every partner loads the same
-   baseline.
+   Compiled June 2026 from each organization's own website and
+   press coverage, so partners verify and correct instead of
+   starting from a blank form. Every entry is verified:false
+   until the organization confirms it. Coordinates are
+   approximate (placed from the published street address).
 
-   All entries below are PLACEHOLDERS drafted after the June 2026
-   convening (Paula Daniels, Seeds of Hope, LADPH, Hollywood Food
-   Coalition, Freedom Farms Collective, Food Access LA, Project
-   Angel Food, Kayla de la Haye). Addresses and coordinates are
-   approximate public locations; capacities, contracts, and needs
-   must be entered by each organization. verified:false until the
-   organization confirms its own entry.
+   Sources are noted per entry. When a partner exports corrected
+   data, merge it here (live mode uses the database instead).
    ============================================================ */
 
 window.SFUA_SEED_SITES = [
+
+  /* ---------------- Seeds of Hope (Episcopal Diocese of LA) ----------------
+     Network: ~92 urban farms, ~75 food pantries, ~70 meal programs across
+     the six-county diocese; ~5 million lbs of food distributed per year
+     (diocesela.org). Each site should eventually be its own entry. */
   {
-    id: "seed-seeds-of-hope-hq",
+    id: "seed-soh-hub",
     org: "Seeds of Hope (Episcopal Diocese of LA)",
-    siteName: "Seeds of Hope — Network Hub (Cathedral Center)",
+    siteName: "Seeds of Hope — Network Hub (St. Paul's Commons)",
     type: "distribution",
     address: "840 Echo Park Ave, Los Angeles, CA 90026",
     lat: 34.0779, lng: -118.2602,
-    products: "Fresh produce from diocesan gardens and farms across LA County",
-    capacity: "",
+    products: "Fresh produce and food distributed through diocesan gardens, pantries, and meal programs",
+    capacity: "Network-wide: ~5 million lbs/year across ~92 urban farms, ~75 pantries, ~70 meal programs (per diocesela.org)",
     coldStorage: false, coldStorageDetails: "",
     transport: "",
     schedule: "",
     contracts: "",
-    needsServed: "Food pantries and feeding programs across the diocese",
+    needsServed: "Food pantries and feeding programs across the six-county diocese",
     offersNeeds: "",
     contactName: "", contactEmail: "",
-    notes: "Placeholder from the June 2026 convening. Seeds of Hope operates many garden, farm, and pantry sites — each should be entered as its own site.",
+    notes: "Pre-filled from seedsofhopela.org and diocesela.org (Jun 2026) — Seeds of Hope to verify and add individual sites.",
+    verified: false,
+    updatedAt: "2026-06-11"
+  },
+  {
+    id: "seed-soh-stmarys",
+    org: "Seeds of Hope (Episcopal Diocese of LA)",
+    siteName: "St. Mary's Episcopal Church — Food Distribution (Koreatown)",
+    type: "market",
+    address: "961 S Mariposa Ave, Los Angeles, CA 90006",
+    lat: 34.0526, lng: -118.2986,
+    products: "Food bags: shelf-stable items, rice, milk, fresh produce",
+    capacity: "",
+    coldStorage: false, coldStorageDetails: "",
+    transport: "",
+    schedule: "2nd & 4th Wednesday, 11am–1pm",
+    contracts: "LA Regional Food Bank partner agency",
+    needsServed: "Koreatown neighbors",
+    offersNeeds: "",
+    contactName: "", contactEmail: "",
+    notes: "Pre-filled from seedsofhopela.org food distributions (Jun 2026) — verify details and pin location.",
+    verified: false,
+    updatedAt: "2026-06-11"
+  },
+  {
+    id: "seed-soh-stjames",
+    org: "Seeds of Hope (Episcopal Diocese of LA)",
+    siteName: "St. James' in-the-City — Pantry & Soup Kitchen (Wilshire)",
+    type: "kitchen",
+    address: "3903 Wilshire Blvd, Los Angeles, CA 90010",
+    lat: 34.0616, lng: -118.3091,
+    products: "Food distribution and prepared meals",
+    capacity: "",
+    coldStorage: false, coldStorageDetails: "",
+    transport: "",
+    schedule: "Distribution Thu 8–9am; soup kitchen Tue 4:30–6:30pm, Fri 3–5pm, Sat 10am–1pm",
+    contracts: "",
+    needsServed: "Mid-Wilshire / Koreatown neighbors",
+    offersNeeds: "",
+    contactName: "", contactEmail: "",
+    notes: "Pre-filled from seedsofhopela.org food distributions (Jun 2026) — verify details and pin location.",
+    verified: false,
+    updatedAt: "2026-06-11"
+  },
+
+  /* ---------------- Hollywood Food Coalition ---------------- */
+  {
+    id: "seed-hofoco-dinner",
+    org: "Hollywood Food Coalition",
+    siteName: "HoFoCo Community Dinner (Salvation Army campus)",
+    type: "kitchen",
+    address: "5939 Hollywood Blvd, Los Angeles, CA 90028",
+    lat: 34.1016, lng: -118.3206,
+    products: "Hot meals served nightly",
+    capacity: "",
+    coldStorage: false, coldStorageDetails: "",
+    transport: "",
+    schedule: "Weekday dinner 6:30–8:00pm",
+    contracts: "",
+    needsServed: "Unhoused and food-insecure neighbors in Hollywood",
+    offersNeeds: "",
+    contactName: "", contactEmail: "",
+    notes: "Pre-filled from hofoco.org (Jun 2026) — HoFoCo to verify.",
     verified: false,
     updatedAt: "2026-06-11"
   },
   {
     id: "seed-hofoco-exchange",
     org: "Hollywood Food Coalition",
-    siteName: "HoFoCo Community Exchange (food recovery & redistribution)",
+    siteName: "HoFoCo Community Exchange & Wellness (Glassell Park)",
     type: "aggregator",
-    address: "5939 Hollywood Blvd, Los Angeles, CA 90028",
-    lat: 34.1016, lng: -118.3206,
-    products: "Recovered/donated food redistributed to partner nonprofits",
-    capacity: "",
-    coldStorage: true, coldStorageDetails: "Cold storage on site — capacity to be confirmed by HoFoCo",
+    address: "3056 Roswell St, Los Angeles, CA 90065",
+    lat: 34.1086, lng: -118.2448,
+    products: "Rescued surplus food from grocers, restaurants, caterers — redistributed",
+    capacity: "Tens of thousands of lbs rescued; distributes to a network of 200+ community-based organizations across LA (per hofoco.org)",
+    coldStorage: true, coldStorageDetails: "Cold storage assumed for food rescue operation — capacity to be confirmed by HoFoCo",
     transport: "",
     schedule: "",
     contracts: "",
-    needsServed: "Partner nonprofits across Hollywood and central LA",
+    needsServed: "200+ partner CBOs serving food-insecure Angelenos",
     offersNeeds: "",
     contactName: "", contactEmail: "",
-    notes: "Placeholder from the June 2026 convening — HoFoCo to confirm details.",
+    notes: "Pre-filled from hofoco.org Community Exchange pages (Jun 2026) — HoFoCo to verify.",
     verified: false,
     updatedAt: "2026-06-11"
   },
+
+  /* ---------------- Project Angel Food ---------------- */
   {
-    id: "seed-hofoco-dinner",
-    org: "Hollywood Food Coalition",
-    siteName: "HoFoCo Nightly Community Dinner",
-    type: "kitchen",
-    address: "1760 N Gower St, Los Angeles, CA 90028",
-    lat: 34.1041, lng: -118.3219,
-    products: "Hot meals served nightly",
-    capacity: "",
-    coldStorage: false, coldStorageDetails: "",
-    transport: "",
-    schedule: "Nightly dinner service",
-    contracts: "",
-    needsServed: "Unhoused and food-insecure neighbors in Hollywood",
-    offersNeeds: "",
-    contactName: "", contactEmail: "",
-    notes: "Placeholder from the June 2026 convening — HoFoCo to confirm details.",
-    verified: false,
-    updatedAt: "2026-06-11"
-  },
-  {
-    id: "seed-project-angel-food",
+    id: "seed-paf-kitchen",
     org: "Project Angel Food",
-    siteName: "Project Angel Food Kitchen & Headquarters",
+    siteName: "Project Angel Food — Kitchen & Headquarters",
     type: "kitchen",
     address: "922 Vine St, Los Angeles, CA 90038",
     lat: 34.0880, lng: -118.3266,
     products: "Medically tailored meals, prepared and delivered countywide",
-    capacity: "",
+    capacity: "~10,000 meals prepared, packaged & delivered weekly; 7,157 clients served FY2025 (per angelfood.org)",
     coldStorage: true, coldStorageDetails: "Commercial kitchen cold storage — capacity to be confirmed",
-    transport: "Delivery fleet serving LA County — details to be confirmed",
+    transport: "Delivery operation covering the majority of LA County — fleet details to be confirmed",
     schedule: "",
-    contracts: "Medically tailored meal contracts (e.g., health plan partnerships) — to be confirmed",
-    needsServed: "Clients with serious illness across LA County",
+    contracts: "Medically tailored meal programs (e.g., health plan partnerships) — to be confirmed",
+    needsServed: "Clients with serious illness across LA County; largest service areas South LA and Metro LA",
     offersNeeds: "",
     contactName: "", contactEmail: "",
-    notes: "Placeholder from the June 2026 convening — Project Angel Food to confirm details.",
+    notes: "Pre-filled from angelfood.org (Jun 2026) — Project Angel Food to verify.",
     verified: false,
     updatedAt: "2026-06-11"
   },
+
+  /* ---------------- Food Access LA (formerly SEE-LA) ----------------
+     Operates eight farmers' markets (Hollywood, LA River, Atwater,
+     Echo Park, Crenshaw, Compton College, Central Ave, Watts-Willowbrook)
+     plus the market-wide "eat!" CSA program. Markets without confirmed
+     addresses below should be added by Food Access LA. */
   {
-    id: "seed-food-access-la",
+    id: "seed-fala-hollywood",
     org: "Food Access LA",
-    siteName: "Crenshaw Farmers' Market",
+    siteName: "Hollywood Farmers' Market",
     type: "market",
-    address: "3650 W Martin Luther King Jr Blvd, Los Angeles, CA 90008",
-    lat: 34.0107, lng: -118.3340,
-    products: "Local farm produce; CSA and market-match programs",
+    address: "1600 Ivar Ave (Ivar & Selma), Los Angeles, CA 90028",
+    lat: 34.0993, lng: -118.3289,
+    products: "Regional farm produce; flagship market; market-wide \"eat!\" CSA boxes from 5–7 farms",
     capacity: "",
     coldStorage: false, coldStorageDetails: "",
     transport: "",
-    schedule: "Weekly market — schedule to be confirmed",
-    contracts: "",
-    needsServed: "South LA residents; nutrition-incentive shoppers",
+    schedule: "Sundays 8am–1pm",
+    contracts: "CalFresh EBT / WIC accepted; Market Match nutrition incentives",
+    needsServed: "Hollywood-area shoppers; participating regional farmers",
     offersNeeds: "",
     contactName: "", contactEmail: "",
-    notes: "Placeholder from the June 2026 convening. Food Access LA operates multiple markets and CSA programs — each should be entered as its own site.",
+    notes: "Pre-filled from foodaccessla.org (Jun 2026) — Food Access LA to verify. Org also runs LA River, Central Ave, and Compton College markets (add addresses).",
     verified: false,
     updatedAt: "2026-06-11"
   },
   {
-    id: "seed-freedom-farms",
-    org: "Freedom Farms Collective",
-    siteName: "Freedom Farms Collective — Growing Sites (location TBD)",
-    type: "producer",
-    address: "South Los Angeles (exact sites to be entered by the collective)",
-    lat: 33.9580, lng: -118.2480,
-    products: "Locally grown produce",
+    id: "seed-fala-atwater",
+    org: "Food Access LA",
+    siteName: "Atwater Village Farmers' Market",
+    type: "market",
+    address: "Public parking lot #646, 3528 Larga Ave, Los Angeles, CA 90039",
+    lat: 34.1232, lng: -118.2620,
+    products: "Regional farm produce and prepared foods",
     capacity: "",
+    coldStorage: false, coldStorageDetails: "",
+    transport: "",
+    schedule: "Sundays 9am–2pm",
+    contracts: "CalFresh EBT / Market Match",
+    needsServed: "Atwater Village & northeast LA shoppers; participating farmers",
+    offersNeeds: "",
+    contactName: "", contactEmail: "",
+    notes: "Pre-filled from foodaccessla.org (Jun 2026) — verify.",
+    verified: false,
+    updatedAt: "2026-06-11"
+  },
+  {
+    id: "seed-fala-echopark",
+    org: "Food Access LA",
+    siteName: "Echo Park Farmers' Market",
+    type: "market",
+    address: "Sunset Blvd & Logan St, Los Angeles, CA 90026",
+    lat: 34.0772, lng: -118.2563,
+    products: "Regional farm produce and prepared foods",
+    capacity: "",
+    coldStorage: false, coldStorageDetails: "",
+    transport: "",
+    schedule: "Fridays 3pm–7:30pm",
+    contracts: "CalFresh EBT / Market Match",
+    needsServed: "Echo Park shoppers; participating farmers",
+    offersNeeds: "",
+    contactName: "", contactEmail: "",
+    notes: "Pre-filled from foodaccessla.org (Jun 2026) — verify.",
+    verified: false,
+    updatedAt: "2026-06-11"
+  },
+  {
+    id: "seed-fala-crenshaw",
+    org: "Food Access LA",
+    siteName: "Crenshaw Farmers' Market (Fire Station #54 lot)",
+    type: "market",
+    address: "5730 Crenshaw Blvd, Los Angeles, CA 90043",
+    lat: 33.9893, lng: -118.3350,
+    products: "Regional farm produce, sprouts, breads, nuts, baked goods, prepared food",
+    capacity: "",
+    coldStorage: false, coldStorageDetails: "",
+    transport: "",
+    schedule: "Saturdays 10am–3pm",
+    contracts: "CalFresh EBT / WIC; Market Match doubles CalFresh up to $20/day",
+    needsServed: "South LA: Angeles Mesa, Hyde Park, Leimert Park, View Park/Windsor Hills, Baldwin Hills",
+    offersNeeds: "",
+    contactName: "", contactEmail: "",
+    notes: "Pre-filled from foodaccessla.org (Jun 2026) — verify.",
+    verified: false,
+    updatedAt: "2026-06-11"
+  },
+  {
+    id: "seed-fala-watts",
+    org: "Food Access LA",
+    siteName: "Watts–Willowbrook Farmers' Market (MLK medical campus)",
+    type: "market",
+    address: "MLK medical campus, 1680 E 120th St, Los Angeles, CA 90059",
+    lat: 33.9230, lng: -118.2424,
+    products: "Regional farm produce",
+    capacity: "",
+    coldStorage: false, coldStorageDetails: "",
+    transport: "",
+    schedule: "Recently reopened — schedule to be confirmed",
+    contracts: "CalFresh EBT / Market Match",
+    needsServed: "Watts & Willowbrook residents; MLK campus patients and staff",
+    offersNeeds: "",
+    contactName: "", contactEmail: "",
+    notes: "Pre-filled from foodaccessla.org and press coverage (Jun 2026) — verify location pin and schedule.",
+    verified: false,
+    updatedAt: "2026-06-11"
+  },
+
+  /* ---------------- Freedom Farms Collective ----------------
+     Urban farming initiative of McCarty Memorial Christian Church and
+     the Jewish Center for Justice — goal of 37 farms across South and
+     West LA (15 created as of 2023 press coverage). */
+  {
+    id: "seed-ffc-mccarty",
+    org: "Freedom Farms Collective",
+    siteName: "Freedom Farms — Anchor (McCarty Memorial Christian Church)",
+    type: "producer",
+    address: "4101 W Adams Blvd, Los Angeles, CA 90018",
+    lat: 34.0324, lng: -118.3329,
+    products: "Locally grown produce across a network of urban farms (backyards, alleys, rooftops, church land)",
+    capacity: "Network goal: 37 urban farms across South & West LA; ~15 created (per partnershipforgrowthla.org / press, 2023)",
+    coldStorage: false, coldStorageDetails: "",
+    transport: "",
+    schedule: "",
+    contracts: "",
+    needsServed: "South and West LA communities",
+    offersNeeds: "",
+    contactName: "", contactEmail: "",
+    notes: "Pre-filled from partnershipforgrowthla.org, freedom-farms.co, and press (Jun 2026) — collective to verify and add each growing site.",
+    verified: false,
+    updatedAt: "2026-06-11"
+  },
+  {
+    id: "seed-ffc-epworth",
+    org: "Freedom Farms Collective",
+    siteName: "Epworth Farm (Saint Mark United Methodist Church)",
+    type: "producer",
+    address: "South Los Angeles — address to be confirmed",
+    lat: null, lng: null,
+    products: "Produce grown on a 9,500 sq ft church property",
+    capacity: "9,500 sq ft growing space (per USC Annenberg Media, 2023)",
     coldStorage: false, coldStorageDetails: "",
     transport: "",
     schedule: "",
@@ -134,10 +289,32 @@ window.SFUA_SEED_SITES = [
     needsServed: "",
     offersNeeds: "",
     contactName: "", contactEmail: "",
-    notes: "Placeholder pin only — Freedom Farms Collective to enter each growing site with real locations and capacity.",
+    notes: "Pre-filled from press coverage (Jun 2026) — needs address and map pin from the collective.",
     verified: false,
     updatedAt: "2026-06-11"
   },
+  {
+    id: "seed-ffc-boden",
+    org: "Freedom Farms Collective",
+    siteName: "Boden St. Community Garden",
+    type: "producer",
+    address: "Boden St, Los Angeles, CA 90016 (approximate)",
+    lat: 34.0246, lng: -118.3577,
+    products: "Squash, rainbow chard, and other garden produce",
+    capacity: "",
+    coldStorage: false, coldStorageDetails: "",
+    transport: "",
+    schedule: "",
+    contracts: "",
+    needsServed: "West Adams neighbors",
+    offersNeeds: "",
+    contactName: "", contactEmail: "",
+    notes: "Pre-filled from USC Annenberg Media coverage (Jun 2026) — pin is approximate; collective to confirm exact location.",
+    verified: false,
+    updatedAt: "2026-06-11"
+  },
+
+  /* ---------------- LA County Dept. of Public Health ---------------- */
   {
     id: "seed-ladph",
     org: "LA County Department of Public Health",
@@ -154,7 +331,7 @@ window.SFUA_SEED_SITES = [
     needsServed: "Countywide food and nutrition security programs, data, and policy support",
     offersNeeds: "",
     contactName: "", contactEmail: "",
-    notes: "Convening and public-health data partner; not a physical food site. Placeholder from the June 2026 convening.",
+    notes: "Convening and public-health data partner; not a physical food site.",
     verified: false,
     updatedAt: "2026-06-11"
   }
